@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+li::marker{
+    font-variant-numeric: unset;
+    unicode-bidi: normal;
+    display: none;
+}
+.image-upload>input {
+    display: none;
+  }
+  li.group.relative.p-3.cursor-pointer.text-gray-500.hover\:text-blue-600 {
+    background: none;
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+  li::marker {
+    content: none;
+  }

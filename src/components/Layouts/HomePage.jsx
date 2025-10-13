@@ -3,6 +3,8 @@ import Sidebar from '../Sidebar';
 import ChatList from '../ChatList';
 import Mainchat from '../Mainchat';
 import SearchModal from '../SearchModal';
+import RequestsModal from '../ReqModal';
+import GroupModal from '../GroupModal';
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../../lib/firebase';
@@ -19,6 +21,13 @@ function HomePage() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);  
   const { setUser, user,otherUser,setOtherUser } = useUser(); // Get user data from useUser hook  
   const navigate = useNavigate();  
+  const [openReqModal, setOpenReqModal] = useState(false);
+  const [openGroupModal, setOpenGroupModal] = useState(false);
+
+  const handleReqModal = () => setOpenReqModal(!openReqModal);
+const handleGroupModal = () => setOpenGroupModal(!openGroupModal);
+
+
   
   useEffect(() => {  
    // Update window width on resize  
@@ -93,21 +102,36 @@ function HomePage() {
           users={userData} // Use userData here
           darkmode={darkmode}
           handleDarkmode={handleDarkmode}
+          handleReqModal={handleReqModal}
+          handleGroupModal={handleGroupModal}
         />
   
-      {windowWidth >= 800 ? (
-  <>  
-    <ChatList onItemClick={handleChatClick} />  
-    <Mainchat chatId={currentChatId} otherUser={otherUser} currentUser={user} />  
+{windowWidth >= 800 ? (
+  <>
+    <ChatList onItemClick={handleChatClick} />
+    <Mainchat chatId={currentChatId} otherUser={otherUser} currentUser={user} />
   </>
 ) : (
   <Routes>
-     <Route path="/" element={<ChatList onItemClick={handleChatClick} />} />
-     <Route path="/chat/:chatId/:userid" element={<Mainchat chatId={currentChatId} otherUser={otherUser} currentUser={user} />} />
-          </Routes>
+    {!selectedChatId && (
+      <Route
+        path=""
+        element={<ChatList onItemClick={handleChatClick} />}
+      />
+    )}
+    {selectedChatId && (
+      <Route
+        path="chat/:chatId/:userid"
+        element={<Mainchat chatId={currentChatId} otherUser={otherUser} currentUser={user} />}
+      />
+    )}
+  </Routes>
 )}
+
     </main>  
-    {openModal && <SearchModal onClose={() => setOpenModal(false)} />}  
+   {openModal && <SearchModal onClose={() => setOpenModal(false)} />}
+   {openReqModal && <RequestsModal onClose={() => setOpenReqModal(false)} />}
+  {openGroupModal && <GroupModal onClose={() => setOpenGroupModal(false)} />}
    </div>  
   );  
 }

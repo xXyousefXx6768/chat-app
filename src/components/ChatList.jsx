@@ -13,39 +13,29 @@ function ChatList({ onItemClick }) {
   const [ou,setou]=useState()
   
   useEffect(() => {
-    // Ensure user and user.id are available before querying Firestore
-    if (user && user.id) {
-      const unSub = onSnapshot(doc(db, 'userChat', user.id), async (res) => {
-       
-        // Handle the case where the document might not exist
-        if (res.exists()) {
-          
-          const items = res.data().chats || [];
-          const promises = items.map(async (item) => {
-            const userDoc = doc(db, 'users', item.receiverId);
-           
-            const userSnap = await getDoc(userDoc);
-           
-            const User = userSnap.data();
-            
-           setou(User)
-            return { ...item, User };
-          });
-          const chatData = await Promise.all(promises);
-          
-          setMessage(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
-         
-        } else {
-          setMessage([]); // No chats, reset the message array
-        }
-      });
+  if (user && user.uid) {
+    const unSub = onSnapshot(doc(db, 'userChat', user.uid), async (res) => {
+      if (res.exists()) {
+        const items = res.data().chats || [];
+        const promises = items.map(async (item) => {
+          const userDoc = doc(db, 'users', item.receiverId);
+          const userSnap = await getDoc(userDoc);
+          const User = userSnap.data();
+          setou(User);
+          return { ...item, User };
+        });
+        const chatData = await Promise.all(promises);
+        setMessage(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
+      } else {
+        setMessage([]);
+      }
+    });
 
-      // Cleanup the listener on component unmount
-      return () => {
-        unSub();
-      };
-    }
-  }, [user]);
+    return () => {
+      unSub();
+    };
+  }
+}, [user]);
 
   const handleChatClick = async(chatId,ou) => {
     const updatedChats = [...message];
@@ -72,7 +62,7 @@ function ChatList({ onItemClick }) {
   };
 
   return (
-    <section className="bg-slate-200 dark:bg-slate-800 transition-colors duration-600 dark:text-white w-[34%] h-full">
+    <section className="bg-slate-200 dark:bg-slate-800 transition-colors duration-600 dark:text-white w-full h-full">
       <div className="title h-16 border-b-[1px] border-b-slate-400 flex items-center ">
         <h2 className="text-2xl pl-3 font-bold">Message</h2>
       </div>

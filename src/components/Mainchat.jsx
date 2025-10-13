@@ -122,7 +122,7 @@ function Mainchat({ chatId, otherUser,currentUser }) {
 
 
   return (
-    <section className="flex h-screen flex-col dark:bg-gray-900 bg-slate-300 w-[62%]">
+    <section className="flex h-screen flex-col dark:bg-gray-900 bg-slate-300 w-full">
       <div className="flex h-screen flex-col">
         {chat ? (
           <div className="flex h-full relative flex-col dark:bg-dark dark:bg-cover transition-colors duration-700 bg-hero-pattern bg-cover">
@@ -131,7 +131,7 @@ function Mainchat({ chatId, otherUser,currentUser }) {
               <div className="top-bar w-[57%] dark:text-white items-center fixed flex h-[14%] rounded-3xl p-5 dark:bg-slate-900 bg-slate-400">
                 <img
                  src={otherUser.profilePicture
-                  || "https://via.placeholder.com/50"}
+                  || "https://placehold.co/50x50"}
                   alt="Profile"
                   className="w-10 h-10 rounded-full cursor-pointer"
                 />
@@ -150,7 +150,7 @@ function Mainchat({ chatId, otherUser,currentUser }) {
   {chat?.messages?.map((msg, index) => (
     <div key={index} className={`mb-2 ${msg.senderId === currentUser.id ? 'text-right' : 'text-left'}`}>
       {/* Message Text */}
-      <p className={`p-2 mt-4 bg-emerald-600 dark:bg-gray-700 rounded-lg inline-block`}>
+      <p className={`p-2 mt-4 bg-emerald-600 dark:bg-gray-700 text-white rounded-lg inline-block`}>
         {msg.text}
       </p>
 

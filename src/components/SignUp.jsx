@@ -1,17 +1,14 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { faHouse, faUser, faRightFromBracket, faCalendar } from '@fortawesome/free-solid-svg-icons';
-import Sidebar from './Sidebar';
-import {  fetchSignInMethodsForEmail } from "firebase/auth";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { getStorage, ref } from "firebase/storage";
-import { doc, setDoc } from "firebase/firestore"; 
+import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import upload from '../lib/upload';
+import toast from 'react-hot-toast'; // ✅ استيراد toast
 function SignUp() {
-  const [profilePic, setProfilePic] = useState({ File: null, url: '' });
+ const [profilePic, setProfilePic] = useState({ File: null, url: '' });
   const [error, setError] = useState('');
+  const navigate = useNavigate(); // ✅ للتنقل بعد النجاح
 
   const handleImg = (e) => {
     if (e.target.files[0]) {
@@ -27,33 +24,38 @@ function SignUp() {
     const data = new FormData(e.target);
     const { email, username, pass } = Object.fromEntries(data);
 
-    // Validate the email format before making the request
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError('Invalid email format. Please enter a valid email.');
+      setError('Invalid email format.');
+      toast.error('Invalid email format!');
       return;
     }
 
     try {
       const res = await createUserWithEmailAndPassword(auth, email, pass);
-      const upimg = await upload(profilePic.File); // Assuming the upload function is defined elsewhere
+      const upimg = await upload(profilePic.File);
 
       await setDoc(doc(db, 'users', res.user.uid), {
         username,
         email,
         profilePicture: upimg,
-        id: res.user.uid, // Use uid instead of id
+        id: res.user.uid,
       });
 
       await setDoc(doc(db, 'userChat', res.user.uid), {
         chats: [],
       });
 
-      console.log('User created successfully!');
+      toast.success('Account created successfully! 🎉'); // ✅ رسالة نجاح
+      navigate('/homepage'); // ✅ التوجيه للصفحة الرئيسية
+
     } catch (error) {
+      console.error(error);
       if (error.code === 'auth/email-already-in-use') {
-        setError('Email is already in use.');
+        setError('Email already in use.');
+        toast.error('Email is already in use.');
       } else {
+        toast.error('Error creating user!');
         setError(`Error creating user: ${error.message}`);
       }
     }

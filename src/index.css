@@ -1,12 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    text-decoration: none;
-}
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
 li::marker{
     font-variant-numeric: unset;
     unicode-bidi: normal;

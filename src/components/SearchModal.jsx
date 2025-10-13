@@ -1,61 +1,69 @@
-import React, { useRef,useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { arrayUnion, collection, doc, getDoc,  getDocs,  query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
-import {  db } from '../lib/firebase';
+import { faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { arrayUnion, collection, doc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
+import { db } from '../lib/firebase';
 import { useUser } from '../contexts/UserContext';
-import { faMagnifyingGlass,faPlus } from '@fortawesome/free-solid-svg-icons';
+import toast from 'react-hot-toast';
+
 function SearchModal({ onClose }) {
   const modalRef = useRef(null);
-  const[people,setPeople]=useState(null)
-  const[add,setAdd]=useState()
-  const {user}=useUser()
-          
-  const handleSearch= async (e) => {
-     e.preventDefault()
-     const formdata= new FormData(e.target)
-     const username =formdata.get('username')
-     try {
-      const userRef= collection(db,'users')
-      const Query=query(userRef,where('username','==',username))
-      const querySnapShot= await getDocs(Query)
+  const [people, setPeople] = useState(null);
+  const [add, setAdd] = useState(false);
+  const { user } = useUser();
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    const formdata = new FormData(e.target);
+    const username = formdata.get('username');
+    try {
+      const userRef = collection(db, 'users');
+      const Query = query(userRef, where('username', '==', username));
+      const querySnapShot = await getDocs(Query);
       if (!querySnapShot.empty) {
-        setPeople(querySnapShot.docs[0].data())
+        setPeople(querySnapShot.docs[0].data());
+      } else {
+        setPeople(null);
       }
-      
-     } catch (error) {
-      console.log(error)
-     }
-  }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-const AddUser= async () => {
-  setAdd(!add)
-     if (setAdd) {
-       const ChatRef= collection(db,'chats')
-       const userChatRef= collection(db,'userChat')
+  const AddUser = async () => {
+    if (!people?.id) {
+      toast.error('No user selected');
+      return;
+    }
+    try {
+      const reqRef = doc(collection(db, 'friendRequests'));
+      await setDoc(reqRef, {
+        id: reqRef.id,
+        from: user.id,
+        to: people.id,
+        status: 'pending',
+        createdAt: serverTimestamp(),
+      });
 
-try {
-  const newchatRef=doc(ChatRef)
-  await setDoc(newchatRef,{
-    createdAt:serverTimestamp(),
-    messages:[]
-  })
-  await updateDoc(doc(userChatRef,user.id),{
-    chats:arrayUnion({
-      chatId:newchatRef.id,
-      lastmessage:'',
-      receiverId:people.id,
-      updateAt:Date.now()
-    })
-  })
-} catch (error) {
-  
-}
+      const notifRef = doc(collection(db, 'notifications'));
+      await setDoc(notifRef, {
+        id: notifRef.id,
+        userId: people.id,
+        type: 'friend_request',
+        from: user.id,
+        seen: false,
+        createdAt: serverTimestamp(),
+      });
 
-     }
-}
+      toast.success('Request sent');
+      setAdd(true);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to send request');
+    }
+  };
 
   const handleClickOutside = (event) => {
-    // Check if the click is outside the modal content
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       onClose();
     }
@@ -64,61 +72,69 @@ try {
   return (
     <div
       onClick={handleClickOutside}
-      className="absolute top-0 justify-center items-center flex overflow-x-hidden overflow-y-auto inset-0 z-50 outline-none focus:outline-none h-screen w-[-webkit-fill-available] bg-black/40"
+      className="fixed inset-0 flex justify-center items-center bg-black/40 z-50 backdrop-blur-sm"
     >
       <section
-        ref={modalRef} // Attach ref to the modal content
-        className="bg-slate-200 rounded-xl w-2/3"
+        ref={modalRef}
+        className="bg-white w-[90%] sm:w-[70%] md:w-[50%] lg:w-[40%] rounded-2xl shadow-2xl p-6 transition-all duration-300"
       >
-        <section className="flex flex-col justify-center items-center">
-          <div className="text-2xl p-6 font-medium font-mono">
-            Search people
-          </div>
-          <form className='w-1/3' onSubmit={handleSearch}>
-          <div className="input-box  overflow-hidden flex rounded-xl mb-7 p-1  bg-slate-400">
-          <FontAwesomeIcon icon={faMagnifyingGlass} className='p-3 ' />
-            <input type="text" name='username' className=' focus:outline-none  w-2/3 focus:ring-0 bg-transparent focus:shadow-none border-0' />
-          </div>
-          </form>
-          <div className='result-box w-full flex pb-9 flex-col items-center '>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">🔍 Search People</h2>
 
+        <form onSubmit={handleSearch} className="flex items-center gap-2 bg-gray-100 rounded-xl p-2 shadow-inner">
+          <FontAwesomeIcon icon={faMagnifyingGlass} className="text-gray-500 px-3 text-lg" />
+          <input
+            type="text"
+            name="username"
+            placeholder="Enter username..."
+            className="flex-1 bg-transparent focus:outline-none text-gray-800 placeholder-gray-400"
+          />
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-all duration-200"
+          >
+            Search
+          </button>
+        </form>
 
-          { people?       
-             <div className='result  min-h-32 max-h-6 overflow-y-auto shadow-lg bg-slate-300 w-2/3 rounded-xl flex flex-col '>
-                  <section className='user-layout justify-around  p-4 flex w-full '>
-                      <div className='userbox  items-center flex'>
-                      <img
+        <div className="mt-8 flex flex-col items-center gap-4">
+          {people ? (
+            <div className="bg-gray-100 w-full p-4 rounded-xl shadow-lg flex items-center justify-between hover:bg-gray-200 transition">
+              <div className="flex items-center gap-3">
+                <img
                   src={people.profilePicture}
                   alt="Profile"
-                  className="w-10 h-10 rounded-full cursor-pointer"
+                  className="w-12 h-12 rounded-full border border-gray-300 object-cover"
                 />
-                         
-                          <h4 className='pl-3 text-lg font-semibold'>
-                                {people.username}
-                           </h4> 
-                           </div>
-                              <div className=' icons bg-slate-200 p-3 cursor-pointer flex '>
-                                { add?
-                               
-                                <p  onClick={AddUser} className='text-sm'>
-                                Added
-                              </p>
-                                :
-                                <FontAwesomeIcon icon={faPlus}  onClick={AddUser} />
-                                }
-                                </div>   
-                         
-                 </section>
-          </div>
-          :
-          <div className='result flex flex-col items-center justify-center rounded-xl bg-slate-300 w-2/3 min-h-32 max-h-6 '>
-            <p className='text-xl font-mono opacity-40'>
-              there is no people
-            </p>
-          </div>
-}
-</div>
-        </section>
+                <h4 className="text-lg font-semibold text-gray-700">{people.username}</h4>
+              </div>
+              <div>
+                {add ? (
+                  <p className="text-green-600 font-medium">Added ✅</p>
+                ) : (
+                  <button
+                    onClick={AddUser}
+                    className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-xl transition-all duration-200"
+                  >
+                    <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="text-gray-400 text-lg font-mono opacity-70 py-8">
+              No user found
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end mt-6">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition border rounded-xl hover:bg-gray-100"
+          >
+            Close
+          </button>
+        </div>
       </section>
     </div>
   );

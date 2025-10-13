@@ -2,11 +2,12 @@ import React from 'react';
 import { useState } from 'react';
 import chaticon from '../assets/chat-round.svg';
 import SearchModal from './SearchModal';
-import { faHouse, faUser, faRightFromBracket, faCommentDots, faUserPlus, faCog, faMoon, faLightbulb } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faUser, faRightFromBracket, faCommentDots, faUserPlus, faCog, faMoon, faLightbulb, faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { useUser } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
-function Sidebar({open,handle,darkmode,handleDarkmode,users}) {
+function Sidebar({open,handle,darkmode,handleDarkmode,users,handleReqModal,handleGroupModal}) {
  
   const navigate = useNavigate();
 
@@ -19,8 +20,8 @@ function Sidebar({open,handle,darkmode,handleDarkmode,users}) {
         </div>
 
         {/* Icons list */}
-        <div className="space-y-3">
-          <ul className="flex flex-col space-y-5">
+        <div className="!space-y-3">
+          <ul className="flex flex-col !space-y-5">
             <li onClick={() => navigate('/homepage')} className="group relative p-3 cursor-pointer text-gray-500 hover:text-blue-600">
               <FontAwesomeIcon icon={faCommentDots} className="h-6 w-6" />
               <span className="absolute left-12 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all bg-gray-800 text-white px-2 py-1 rounded-md text-sm">
@@ -33,6 +34,18 @@ function Sidebar({open,handle,darkmode,handleDarkmode,users}) {
                 Add User
               </span>
             </li>
+            <li className="group relative p-3 cursor-pointer text-gray-500 hover:text-blue-600">
+               <FontAwesomeIcon icon={faUserGroup} onClick={handleReqModal} className="h-6 w-6" />
+                 <span className="absolute left-12 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all bg-gray-800 text-white px-2 py-1 rounded-md text-sm">
+                    friend request
+                 </span>
+                 </li>
+            <li className="group relative p-3 cursor-pointer text-gray-500 hover:text-blue-600">
+               <FontAwesomeIcon icon={faUsers} onClick={handleGroupModal} className="h-6 w-6" />
+                 <span className="absolute left-12 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all bg-gray-800 text-white px-2 py-1 rounded-md text-sm">
+                    Create Group
+                 </span>
+                 </li>
             <li className="group relative p-3 cursor-pointer text-gray-500 hover:text-blue-600">
               <FontAwesomeIcon icon={faUser} className="h-6 w-6" />
               <span className="absolute left-12 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all bg-gray-800 text-white px-2 py-1 rounded-md text-sm">
@@ -81,7 +94,7 @@ function Sidebar({open,handle,darkmode,handleDarkmode,users}) {
             <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
               {/* Placeholder or loading state */}
               <img
-                  src="https://via.placeholder.com/50"
+                  src="https://placehold.co/50x50"
                   alt="Profile"
                   className="w-10 h-10 rounded-full cursor-pointer"
                 />

@@ -4,6 +4,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'; // Change Naviga
 import { auth } from '../lib/firebase';
 import { useUser } from '../contexts/UserContext';
 import toast from 'react-hot-toast';
+import { motion } from "framer-motion";
 
 function Login() {
   // Get the user state and setUser function from the context
@@ -47,48 +48,112 @@ function Login() {
   };
 
   return (
-    <div className='flex flex-col sm:w-full md:w-2/4 h-3/4 justify-center bg-blue-800 rounded-xl bg-clip-padding backdrop-filter shadow-md backdrop-blur-md bg-opacity-40 border border-indigo-500/50 items-center gap-6'>
-      <div className='text-white title justify-items-center'>
-        <h1 className='text-4xl font-medium tracking-wide'>Login</h1>
-      </div>
-      <section className='flex flex-col inputs-group gap-4 w-2/3'>
-        <form className='flex items-center flex-col gap-4' onSubmit={handleLogin}>
-         
-          <div className="relative w-full max-w-[490px] h-10">
-            <input
-              name='email'
-              type="email"
-              className="peer w-full h-full bg-transparent text-blue-gray-700 font-sans font-normal outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-cyan-500 placeholder-shown:border-t-blue-gray-200 border focus:border-2 focus:border-t-transparent text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-gray-900"
-              placeholder=" "
-            />
-            <label className="flex w-full h-full text-xs select-none pointer-events-none absolute left-0 font-normal !overflow-visible truncate peer-placeholder-shown:text-white leading-tight peer-focus:leading-tight peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-white-500 transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all peer-disabled:before:border-transparent after:content[' '] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-disabled:after:border-transparent peer-placeholder-shown:leading-[3.75] text-gray-500 peer-focus:text-gray-900 before:border-blue-gray-200 peer-focus:before:!border-gray-900 after:border-blue-gray-200 peer-focus:after:!border-gray-900">
-              Email
-            </label>
-          </div>
+    <motion.div
+      initial={{ opacity: 0, y: 50, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="flex flex-col sm:w-[90%] md:w-2/4 h-auto py-10 px-6 justify-center items-center 
+      bg-gradient-to-br from-slate-800/70 via-indigo-900/60 to-blue-800/80 
+      rounded-3xl backdrop-blur-lg shadow-2xl border border-white/20 gap-8"
+    >
+      {/* ===== Title ===== */}
+      <motion.h1
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="text-white text-5xl font-extrabold tracking-wide drop-shadow-lg"
+      >
+        Welcome Back 👋
+      </motion.h1>
 
-          <div className="relative w-full max-w-[490px] h-10">
-            <input
-              name='pass'
-              type="password"
-              className="peer w-full h-full bg-transparent text-blue-gray-700 font-sans font-normal outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-cyan-500 placeholder-shown:border-t-blue-gray-200 border focus:border-2 focus:border-t-transparent text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-gray-900"
-              placeholder=" "
-            />
-            <label className="flex w-full h-full select-none pointer-events-none absolute left-0 font-normal !overflow-visible truncate peer-placeholder-shown:text-white leading-tight peer-focus:leading-tight peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-white-500 transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t text-xs peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all peer-disabled:before:border-transparent after:content[' '] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-disabled:after:border-transparent peer-placeholder-shown:leading-[3.75] text-gray-500 peer-focus:text-gray-900 before:border-blue-gray-200 peer-focus:before:!border-gray-900 after:border-blue-gray-200 peer-focus:after:!border-gray-900">
-              Password
-            </label>
-          </div>
+      {/* ===== Form ===== */}
+      <motion.form
+        onSubmit={handleLogin}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="flex flex-col gap-6 w-full md:w-3/4"
+      >
+        {/* ==== Email ==== */}
+        <motion.div
+          whileFocus={{ scale: 1.03 }}
+          className="relative w-full"
+        >
+          <input
+            name="email"
+            type="email"
+            required
+            className="peer w-full px-4 py-3 rounded-xl border border-white/30 bg-white/10 
+            text-white placeholder-transparent outline-none focus:ring-2 focus:ring-cyan-400 
+            transition-all duration-300 shadow-inner"
+            placeholder="Email"
+          />
+          <label
+            className="absolute left-4 top-2.5 text-white/70 text-sm 
+            transition-all duration-200 peer-placeholder-shown:top-3.5 
+            peer-placeholder-shown:text-base peer-focus:top-1.5 
+            peer-focus:text-sm peer-focus:text-cyan-300"
+          >
+            Email
+          </label>
+        </motion.div>
 
-          <div className='submission flex flex-col w-full justify-center items-center'>
-            <button type="submit" className="rounded-full w-2/3 bg-slate-800 px-5 py-3 text-base font-medium text-white transition duration-200 hover:bg-slate-100 hover:text-black active:bg-navy-900 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/30">
-              Sign In
-            </button>
-            <Link to="/auth/signup" className="text-white mt-4">
-              Don't have an account? Sign Up here
+        {/* ==== Password ==== */}
+        <motion.div
+          whileFocus={{ scale: 1.03 }}
+          className="relative w-full"
+        >
+          <input
+            name="pass"
+            type="password"
+            required
+            className="peer w-full px-4 py-3 rounded-xl border border-white/30 bg-white/10 
+            text-white placeholder-transparent outline-none focus:ring-2 focus:ring-indigo-400 
+            transition-all duration-300 shadow-inner"
+            placeholder="Password"
+          />
+          <label
+            className="absolute left-4 top-2.5 text-white/70 text-sm 
+            transition-all duration-200 peer-placeholder-shown:top-3.5 
+            peer-placeholder-shown:text-base peer-focus:top-1.5 
+            peer-focus:text-sm peer-focus:text-indigo-300"
+          >
+            Password
+          </label>
+        </motion.div>
+
+        {/* ==== Button ==== */}
+        <motion.button
+          whileHover={{ scale: 1.05, backgroundColor: "#38bdf8" }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: "spring", stiffness: 200 }}
+          type="submit"
+          className="mt-4 w-full py-3 rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500 
+          text-white text-lg font-semibold tracking-wide shadow-lg 
+          hover:shadow-cyan-400/30 transition-all duration-300"
+        >
+          Sign In
+        </motion.button>
+
+        {/* ==== Link ==== */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className="text-center mt-4"
+        >
+          <p className="text-white/80 text-sm">
+            Don’t have an account?{" "}
+            <Link
+              to="/auth/signup"
+              className="text-cyan-300 hover:underline hover:text-cyan-200 transition"
+            >
+              Sign up here
             </Link>
-          </div>
-        </form>
-      </section>
-    </div>
+          </p>
+        </motion.div>
+      </motion.form>
+    </motion.div>
   );
 }
 

@@ -1,30 +1,44 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { auth, db } from "../lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, setPersistence, browserSessionPersistence } from "firebase/auth";
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [otherUser, setOtherUser] = useState(null);
-  const [loading, setLoading] = useState(true); // عشان نستنى التحقق من حالة المستخدم
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        const userRef = doc(db, "users", currentUser.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          setUser(userSnap.data());
-        }
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
+    setPersistence(auth, browserSessionPersistence)
+      .then(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+          if (currentUser) {
+            try {
+              const userRef = doc(db, "users", currentUser.uid);
+              const userSnap = await getDoc(userRef);
+              if (userSnap.exists()) {
+                setUser({ ...userSnap.data(), id: currentUser.uid });
+              } else {
+                console.error("User document not found!");
+                setUser(null);
+              }
+            } catch (error) {
+              console.error("Error fetching user data:", error);
+            }
+          } else {
+            setUser(null);
+          }
+          setLoading(false);
+        });
 
-    return () => unsubscribe();
+        return () => unsubscribe();
+      })
+      .catch((error) => {
+        console.error("Error setting session persistence:", error);
+        setLoading(false);
+      });
   }, []);
 
   if (loading) return <div className="text-center p-5">Loading...</div>;

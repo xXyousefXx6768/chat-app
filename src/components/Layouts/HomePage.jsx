@@ -11,83 +11,40 @@ import { auth, db } from '../../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useUser } from '../../contexts/UserContext';
 
-function HomePage() {  
-  const [openModal, setOpenModal] = useState(false);  
-  const [darkmode, setDarkmode] = useState(false);  
-  const [selectedChatId, setSelectedChatId] = useState(null);  
-  const [currentChatId, setCurrentChatId] = useState(null);  
-  const [currentUserId, setCurrentUserId] = useState(null); // Define currentUserId state  
-  const [userData, setUserData] = useState(null);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);  
-  const { setUser, user,otherUser,setOtherUser } = useUser(); // Get user data from useUser hook  
-  const navigate = useNavigate();  
+function HomePage() {
+  const [openModal, setOpenModal] = useState(false);
+  const [darkmode, setDarkmode] = useState(false);
+  const [selectedChatId, setSelectedChatId] = useState(null);
+  const [currentChatId, setCurrentChatId] = useState(null);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const { setUser, user, otherUser, setOtherUser } = useUser();
+  const navigate = useNavigate();
   const [openReqModal, setOpenReqModal] = useState(false);
   const [openGroupModal, setOpenGroupModal] = useState(false);
 
   const handleReqModal = () => setOpenReqModal(!openReqModal);
-const handleGroupModal = () => setOpenGroupModal(!openGroupModal);
+  const handleGroupModal = () => setOpenGroupModal(!openGroupModal);
 
-
-  
-  useEffect(() => {  
-   // Update window width on resize  
-   const handleResize = () => setWindowWidth(window.innerWidth);  
-   window.addEventListener('resize', handleResize);  
-  
-   return () => {  
-    window.removeEventListener('resize', handleResize);  
-   };  
-  }, []);  
-  
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const docRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(docRef);
-  
-        if (docSnap.exists()) {
-          const data = docSnap.data(); // Fetch data from the document
-          // Log the retrieved user data
-          setUserData(data); // Set the userData state with the retrieved data
-          if (data.id) {
-           
-            setUser(data); // Set the user context
-            setCurrentUserId(data.id); // Set the current user ID
-            
-          } else {
-            console.error('userId is missing in the document!');
-          }
-        } else {
-          console.log('No such document!');
-        }
-      } else {
-        setUser(null);
-        setCurrentUserId(null); // Reset currentUserId state
-        setUserData(null); // Reset userData
-      }
-    });
-  
-    return () => unsubscribe();
-  }, [setUser]);
-  
-  const handleopen = () => {
-    setOpenModal(!openModal);
-  };
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  const handleDarkmode = () => {
-    setDarkmode(!darkmode);
-  };
+  const handleopen = () => setOpenModal(!openModal);
+  const handleDarkmode = () => setDarkmode(!darkmode);
 
-  const handleChatClick = (chatId,userid) => {
+  const handleChatClick = (chatId, userid) => {
     if (chatId) {
       setSelectedChatId(chatId);
       setCurrentChatId(chatId);
-      setOtherUser(userid) // Ensure currentChatId is set
-      navigate(`/homepage/chat/${chatId}/${userid}`); // Navigate to the chat
+      setOtherUser(userid);
+      navigate(`/homepage/chat/${chatId}/${userid}`);
     } else {
       console.error('Chat ID is undefined');
     }
   };
+
   if (!user) {
     return <Navigate to="/auth/signup" replace />;
   }
@@ -99,7 +56,7 @@ const handleGroupModal = () => setOpenGroupModal(!openGroupModal);
     <Sidebar
           open={openModal}
           handle={handleopen}
-          users={userData} // Use userData here
+          users={user} // Use userData here
           darkmode={darkmode}
           handleDarkmode={handleDarkmode}
           handleReqModal={handleReqModal}
@@ -108,15 +65,15 @@ const handleGroupModal = () => setOpenGroupModal(!openGroupModal);
   
 {windowWidth >= 800 ? (
   <>
-    <ChatList onItemClick={handleChatClick} />
+    <ChatList onItemClick={handleChatClick} user={user} />
     <Mainchat chatId={currentChatId} otherUser={otherUser} currentUser={user} />
   </>
 ) : (
   <Routes>
     {!selectedChatId && (
       <Route
-        path=""
-        element={<ChatList onItemClick={handleChatClick} />}
+        path="/homepage"
+        element={<ChatList onItemClick={handleChatClick} user={user} />}
       />
     )}
     {selectedChatId && (

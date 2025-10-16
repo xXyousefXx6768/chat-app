@@ -7,9 +7,27 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { useUser } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
+import { signOut } from "firebase/auth";
+import { auth } from "../lib/firebase"; 
+import toast from "react-hot-toast";
+
 function Sidebar({open,handle,darkmode,handleDarkmode,users,handleReqModal,handleGroupModal}) {
- 
+  const { setUser } = useUser();
   const navigate = useNavigate();
+
+
+   const handleLogout = async () => {
+    try {
+      await signOut(auth); // تسجيل خروج من Firebase
+      setUser(null);       // مسح بيانات المستخدم من الـ context
+      toast.success("Logged out successfully 👋");
+      navigate("/auth/login"); // توجيه لصفحة اللوجين
+    } catch (error) {
+      console.error("Error during logout:", error);
+      toast.error("Logout failed. Please try again!");
+    }
+  };
+
 
   return (
     <div className="bg-gray-100 dark:bg-slate-800 transition-colors duration-600 h-screen flex flex-col justify-between items-center py-4">
@@ -53,8 +71,9 @@ function Sidebar({open,handle,darkmode,handleDarkmode,users,handleReqModal,handl
               </span>
             </li>
             <li className="group relative p-3 cursor-pointer text-gray-500 hover:text-blue-600">
-              <FontAwesomeIcon icon={faRightFromBracket} className="h-6 w-6" />
-              <span className="absolute left-12 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all bg-gray-800 text-white px-3 py-1 rounded-md  text-sm">
+              <FontAwesomeIcon icon={faRightFromBracket} onClick={handleLogout} className="h-6 w-6" />
+              <span 
+              className="absolute left-12 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all bg-gray-800 text-white px-3 py-1 rounded-md  text-sm">
                 Logout
               </span>
             </li>

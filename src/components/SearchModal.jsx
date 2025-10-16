@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { arrayUnion, collection, doc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDocs, query, serverTimestamp, setDoc, where } from "firebase/firestore";
 import { db } from '../lib/firebase';
 import { useUser } from '../contexts/UserContext';
 import toast from 'react-hot-toast';
@@ -72,25 +72,27 @@ function SearchModal({ onClose }) {
   return (
     <div
       onClick={handleClickOutside}
-      className="fixed inset-0 flex justify-center items-center bg-black/40 z-50 backdrop-blur-sm"
+      className="fixed inset-0 flex justify-center items-center bg-black/40 backdrop-blur-sm z-50"
     >
-      <section
+      <div
         ref={modalRef}
-        className="bg-white w-[90%] sm:w-[70%] md:w-[50%] lg:w-[40%] rounded-2xl shadow-2xl p-6 transition-all duration-300"
+        className="w-[90%] sm:w-[75%] md:w-[50%] lg:w-[40%] bg-white from-slate-100 dark:bg-gray-900 dark:text-gray-100 to-slate-200 rounded-3xl shadow-2xl p-6 border border-white/20 backdrop-blur-md transition-all duration-300"
       >
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">🔍 Search People</h2>
+        <h2 className="text-2xl sm:text-3xl font-semibold  mb-6 text-center">
+          Search People
+        </h2>
 
-        <form onSubmit={handleSearch} className="flex items-center gap-2 bg-gray-100 rounded-xl p-2 shadow-inner">
+        <form onSubmit={handleSearch} className="flex items-center  rounded-2xl shadow-inner p-2">
           <FontAwesomeIcon icon={faMagnifyingGlass} className="text-gray-500 px-3 text-lg" />
           <input
             type="text"
             name="username"
             placeholder="Enter username..."
-            className="flex-1 bg-transparent focus:outline-none text-gray-800 placeholder-gray-400"
+            className="flex-1 bg-transparent focus:outline-none text-gray-700 placeholder-gray-400 text-base"
           />
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-all duration-200"
+            className="bg-gradient-to-r from-indigo-500 to-blue-600 text-white px-5 py-2 rounded-2xl font-medium hover:opacity-90 transition"
           >
             Search
           </button>
@@ -98,7 +100,7 @@ function SearchModal({ onClose }) {
 
         <div className="mt-8 flex flex-col items-center gap-4">
           {people ? (
-            <div className="bg-gray-100 w-full p-4 rounded-xl shadow-lg flex items-center justify-between hover:bg-gray-200 transition">
+            <div className="bg-white/80 dark:!bg-gray-800/40 w-full p-4 rounded-2xl shadow-md flex items-center justify-between hover:shadow-lg transition-all duration-200">
               <div className="flex items-center gap-3">
                 <img
                   src={people.profilePicture}
@@ -113,7 +115,7 @@ function SearchModal({ onClose }) {
                 ) : (
                   <button
                     onClick={AddUser}
-                    className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-xl transition-all duration-200"
+                    className="bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white px-3 py-2 rounded-2xl transition-all duration-200"
                   >
                     <FontAwesomeIcon icon={faPlus} />
                   </button>
@@ -127,15 +129,15 @@ function SearchModal({ onClose }) {
           )}
         </div>
 
-        <div className="flex justify-end mt-6">
+        <div className="flex justify-end mt-8">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition border rounded-xl hover:bg-gray-100"
+            className="px-5 py-2 rounded-2xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition font-medium"
           >
             Close
           </button>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

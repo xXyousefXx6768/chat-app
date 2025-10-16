@@ -6,31 +6,23 @@ import { db } from '../lib/firebase';
 import Chatimg from '../assets/chat.png';
 import upload from '../lib/upload';
 
-function Mainchat({ chatId, otherUser,currentUser }) {
+function Mainchat({ chatId, otherUser, currentUser }) {
   const [chat, setChat] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [recipientId, setRecipientId] = useState(null);
-  const [img, setImg] = useState({
-    file: null,
-    url: ''
-  });
+  const [img, setImg] = useState({ file: null, url: '' });
 
-  
-
-  // Load chat data on component mount
   useEffect(() => {
-    if (chatId) {
+    if (chatId && otherUser) {
       const unsub = onSnapshot(doc(db, 'chats', chatId), (res) => {
         const chatData = res.data();
         setChat(chatData);
         setRecipientId(otherUser.id);
       });
 
-      return () => {
-        unsub();
-      };
+      return () => unsub();
     }
-  }, [chatId]);
+  }, [chatId, otherUser]);
 
   const handleSendMessage = async () => {
     console.log('Sending message...'); // Added log

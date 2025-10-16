@@ -13,27 +13,33 @@ function ChatList({ onItemClick }) {
   const [ou,setou]=useState()
   
   useEffect(() => {
-  if (user && user.uid) {
-    const unSub = onSnapshot(doc(db, 'userChat', user.uid), async (res) => {
+  if (user && user.id) {
+  const unSub = onSnapshot(doc(db, 'userChat', user.id), async (res) => {
       if (res.exists()) {
         const items = res.data().chats || [];
+       console.log("Snapshot data:", res.data());
+
         const promises = items.map(async (item) => {
+          if (!item.receiverId || typeof item.receiverId !== "string") {
+            console.error("Invalid receiverId:", item.receiverId);
+            return null;
+          }
+
           const userDoc = doc(db, 'users', item.receiverId);
           const userSnap = await getDoc(userDoc);
           const User = userSnap.data();
-          setou(User);
+
           return { ...item, User };
         });
-        const chatData = await Promise.all(promises);
+
+        const chatData = (await Promise.all(promises)).filter(Boolean);
         setMessage(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
       } else {
         setMessage([]);
       }
     });
 
-    return () => {
-      unSub();
-    };
+    return () => unSub();
   }
 }, [user]);
 

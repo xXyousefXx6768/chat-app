@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faUpload, faSmile } from "@fortawesome/free-solid-svg-icons";
 import { doc, onSnapshot, updateDoc, arrayUnion, serverTimestamp, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import Chatimg from '../assets/chat.png';
@@ -114,90 +114,105 @@ function Mainchat({ chatId, otherUser, currentUser }) {
 
 
   return (
-    <section className="flex h-screen flex-col dark:bg-gray-900 bg-slate-300 w-full">
-      <div className="flex h-screen flex-col">
-        {chat ? (
-          <div className="flex h-full relative flex-col dark:bg-dark dark:bg-cover transition-colors duration-700 bg-hero-pattern bg-cover">
-            {/* Chat display */}
-            <div className="top-layout h-36 p-5 flex w-full">
-              <div className="top-bar w-[57%] dark:text-white items-center fixed flex h-[14%] rounded-3xl p-5 dark:bg-slate-900 bg-slate-400">
-                <img
-                 src={otherUser.profilePicture
-                  || "https://placehold.co/50x50"}
-                  alt="Profile"
-                  className="w-10 h-10 rounded-full cursor-pointer"
-                />
-                <h4 className="pl-3 self-center text-xl font-semibold">
-                  {otherUser.username} {/* Adjust this field to display the chat recipient */}
-                </h4>
+    <section className="flex h-screen flex-col w-full dark:bg-gray-900 bg-gradient-to-b from-slate-100 to-slate-300 transition-all duration-500">
+      {chat ? (
+        <>
+          {/* ==== Header ==== */}
+          <div className="flex items-center justify-between p-4 border-b border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/90 backdrop-blur-lg shadow-sm sticky top-0 z-20">
+            <div className="flex items-center gap-3">
+              <img
+                src={otherUser.profilePicture || "https://placehold.co/50x50"}
+                alt="Profile"
+                className="w-10 h-10 rounded-full object-cover border border-slate-300"
+              />
+              <div>
+                <h4 className="text-lg font-semibold dark:text-white">{otherUser.username}</h4>
+                <p className="text-xs text-green-500 dark:text-green-400">Online</p>
               </div>
             </div>
-
-            {/* Messages section */}
-            <section className="flex overflow-y-auto outline-none  [&::-webkit-scrollbar]:w-2
-  [&::-webkit-scrollbar-track]:bg-gray-100
-  [&::-webkit-scrollbar-thumb]:bg-gray-300
-  dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-  dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 flex-col mb-20 p-7">
-  {chat?.messages?.map((msg, index) => (
-    <div key={index} className={`mb-2 ${msg.senderId === currentUser.id ? 'text-right' : 'text-left'}`}>
-      {/* Message Text */}
-      <p className={`p-2 mt-4 bg-emerald-600 dark:bg-gray-700 text-white rounded-lg inline-block`}>
-        {msg.text}
-      </p>
-
-      {/* Render the image if the img field exists and align it based on sender */}
-      {msg.img && (
-        <div className={`flex m-3 ${msg.senderId === currentUser.id ? 'justify-end' : 'justify-start'}`}>
-          <img src={msg.img} alt="Uploaded" className="w-[14rem] rounded-lg" />
-        </div>
-      )}
-    </div>
-  ))}
-</section>
-
-
-
-           
-
-            {/* Input section */}
-            <section className="p-7 flex w-full absolute bottom-0 left-0">
-              <div className="flex items-center h-16 w-full rounded-3xl dark:bg-slate-900 bg-slate-300 p-4">
-                <label htmlFor="file-input">
-                  <FontAwesomeIcon className="h-4 cursor-pointer" icon={faUpload} />
-                </label>
-                <input id="file-input" type="file" className="hidden" onChange={handleImg} />
-
-                {/* Message Input */}
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyUp={handleKeyPress} // Handle "Enter" press
-                  placeholder="Add message....."
-                  className="h-11 p-7 w-full dark:text-white focus:outline-none border-0 bg-transparent"
-                />
-
-                {/* Send Button */}
-                <button
-                  onClick={handleSendMessage}
-                  className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
-                >
-                  Send
-                </button>
-              </div>
-            </section>
+            <FontAwesomeIcon
+              icon={faSmile}
+              className="text-slate-500 dark:text-slate-300 cursor-pointer text-xl"
+            />
           </div>
-        ) : (
-          <div className="flex h-screen justify-center items-center flex-col">
-            <div className="flex">
+
+          {/* ==== Messages Section ==== */}
+          <section
+            className="flex flex-col flex-grow overflow-y-auto p-6 gap-4 
+            dark:bg-slate-800
+            scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-transparent 
+            dark:scrollbar-thumb-slate-600"
+          >
+            {chat?.messages?.map((msg, index) => {
+              const isSender = msg.senderId === currentUser.id;
+              return (
+                <div
+                  key={index}
+                  className={`flex flex-col ${isSender ? "items-end" : "items-start"}`}
+                >
+                  {/* Message Bubble */}
+                  <div
+                    className={`max-w-[70%] rounded-2xl p-3 text-sm shadow-md break-words ${
+                      isSender
+                        ? "bg-blue-500 text-white rounded-br-none"
+                        : "bg-white dark:bg-slate-700 text-slate-800 dark:text-white rounded-bl-none"
+                    }`}
+                  >
+                    {msg.text}
+                  </div>
+
+                  {/* Image if exists */}
+                  {msg.img && (
+                    <img
+                      src={msg.img}
+                      alt="Uploaded"
+                      className={`mt-2 rounded-xl max-w-[60%] ${
+                        isSender ? "self-end" : "self-start"
+                      }`}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </section>
+
+          {/* ==== Input Section ==== */}
+          <section className="p-4 bg-white/80 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-300 dark:border-slate-700 flex items-center gap-3">
+            {/* Upload Icon */}
+            <label htmlFor="file-input" className="cursor-pointer text-slate-600 dark:text-slate-300 hover:text-blue-500 transition">
+              <FontAwesomeIcon icon={faUpload} className="text-xl" />
+              <input id="file-input" type="file" className="hidden" onChange={handleImg} />
+            </label>
+
+            {/* Input Field */}
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyUp={handleKeyPress}
+              placeholder="Type a message..."
+              className="flex-grow bg-transparent text-slate-800 dark:text-white placeholder:text-slate-400 outline-none px-2"
+            />
+
+            {/* Send Button */}
+            <button
+              onClick={handleSendMessage}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition shadow-sm"
+            >
+              <FontAwesomeIcon icon={faPaperPlane} />
+            </button>
+          </section>
+        </>
+      )  : (
+          <div className="flex h-screen justify-center items-center dark:text-white dark:bg-gray-800 flex-col">
+            <div className="flex ">
               <h2 className="text-4xl font-sans font-medium">QuikChat</h2>
               <img src={Chatimg} alt="chat" className="h-20" />
             </div>
             <h4 className="text-base font-bold mt-2">Select user to send message</h4>
           </div>
         )}
-      </div>
+     
     </section>
   );
 

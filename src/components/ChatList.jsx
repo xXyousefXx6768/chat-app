@@ -1,104 +1,116 @@
 import React, { useState, useEffect } from 'react';
-import { faMessage } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { doc, onSnapshot, getDoc,updateDoc } from 'firebase/firestore';
+import { doc, onSnapshot, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { useUser, } from '../contexts/UserContext';
-import { useNavigate } from 'react-router-dom';
-
+import { useUser } from '../contexts/UserContext';
+import { motion } from 'framer-motion';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function ChatList({ onItemClick }) {
   const [message, setMessage] = useState([]);
+  const [search, setSearch] = useState('');
   const { user } = useUser();
-  const [ou,setou]=useState()
-  
+
   useEffect(() => {
-  if (user && user.id) {
-  const unSub = onSnapshot(doc(db, 'userChat', user.id), async (res) => {
-      if (res.exists()) {
-        const items = res.data().chats || [];
-       console.log("Snapshot data:", res.data());
+    if (user && user.id) {
+      const unSub = onSnapshot(doc(db, 'userChat', user.id), async (res) => {
+        if (res.exists()) {
+          const items = res.data().chats || [];
+          const promises = items.map(async (item) => {
+            if (!item.receiverId) return null;
+            const userDoc = doc(db, 'users', item.receiverId);
+            const userSnap = await getDoc(userDoc);
+            const User = userSnap.data();
+            return { ...item, User };
+          });
+          const chatData = (await Promise.all(promises)).filter(Boolean);
+          setMessage(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
+        } else setMessage([]);
+      });
+      return () => unSub();
+    }
+  }, [user]);
 
-        const promises = items.map(async (item) => {
-          if (!item.receiverId || typeof item.receiverId !== "string") {
-            console.error("Invalid receiverId:", item.receiverId);
-            return null;
-          }
-
-          const userDoc = doc(db, 'users', item.receiverId);
-          const userSnap = await getDoc(userDoc);
-          const User = userSnap.data();
-
-          return { ...item, User };
-        });
-
-        const chatData = (await Promise.all(promises)).filter(Boolean);
-        setMessage(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
-      } else {
-        setMessage([]);
-      }
-    });
-
-    return () => unSub();
-  }
-}, [user]);
-
-  const handleChatClick = async(chatId,ou) => {
+  const handleChatClick = async (chatId, ou) => {
     const updatedChats = [...message];
-    const chatIndex = updatedChats.findIndex(item => item.chatId === chatId);
+    const chatIndex = updatedChats.findIndex((item) => item.chatId === chatId);
 
     if (chatIndex !== -1) {
       updatedChats[chatIndex].isSeen = true;
-
       const userChatRef = doc(db, 'userChat', user.id);
-      try {
-        await updateDoc(userChatRef, {
-          chats: updatedChats,
-        });
-      } catch (error) {
-        console.log('Error updating chat seen status:', error);
-      }
-
-      if (onItemClick) {
-        onItemClick(chatId, ou);
-      }
-    } else {
-      console.error('Chat not found in message list');
+      await updateDoc(userChatRef, { chats: updatedChats });
+      if (onItemClick) onItemClick(chatId, ou);
     }
   };
 
+  // 🔍 Filter messages based on search
+  const filteredMessages = message.filter((msg) =>
+    msg.User?.username?.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <section className="bg-slate-200 dark:bg-slate-800 transition-colors duration-600 dark:text-white w-full h-full">
-      <div className="title h-16 border-b-[1px] border-b-slate-400 flex items-center ">
-        <h2 className="text-2xl pl-3 font-bold">Message</h2>
+    <section className="w-full h-full bg-gradient-to-b from-slate-100/90 to-slate-200/90 dark:from-slate-900 dark:to-slate-800 backdrop-blur-xl transition-colors duration-500">
+      {/* Header */}
+      <div className="h-25 border-b border-slate-300 dark:border-slate-800 flex flex-col justify-center px-4 backdrop-blur-lg sticky top-0 z-10">
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-white tracking-wide mb-2">Messages</h2>
+        <div className="relative ">
+          <input
+            type="text"
+            placeholder="Search conversations..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-slate-200/60 dark:bg-slate-900 text-slate-800 dark:text-white rounded-lg py-2 pl-10 pr-3  outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+          />
+          <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-3 text-slate-500 dark:text-slate-400" />
+        </div>
       </div>
-      {message.length > 0 ? (
-        <div className="list-layout h-[87%] flex flex-col overflow-y-auto">
-          {message.map((msg, index) => (
-            <section
+
+      {/* Chat list */}
+      {filteredMessages.length > 0 ? (
+        <div className="h-[calc(100%-5rem)] flex flex-col overflow-hidden scrollbar-thin scrollbar-thumb-slate-400 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent">
+          {filteredMessages.map((msg, index) => (
+            <motion.section
               key={index}
-              className={`border-b-[1px] border-b-slate-400 transition-colors duration-500 flex cursor-pointer h-[5rem] 
-                ${ msg.isSeen 
-                  ? 'bg-slate-300 dark:bg-slate-800' 
-                  : 'bg-teal-400 text-white dark:bg-slate-700 hover:bg-slate-500 dark:hover:bg-slate-400'}`}
-              onClick={() => handleChatClick(msg.chatId,msg.User)} // Pass the chatId on click
+              whileHover={{ scale: 1.01 }}
+              transition={{ duration: 0.15 }}
+              className={`flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700 cursor-pointer 
+                ${msg.isSeen
+                  ? 'bg-transparent hover:bg-slate-200/60 dark:hover:bg-slate-700/50'
+                  : 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg hover:brightness-110'}`}
+              onClick={() => handleChatClick(msg.chatId, msg.User)}
             >
-              <section className="flex items-center chat-box pl-3">
-                <div className="list-img">
-                  <img src={msg.User.profilePicture || "https://via.placeholder.com/50"} alt="Profile" className="w-10 h-10 rounded-full cursor-pointer" />
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <img
+                    src={msg.User?.profilePicture || 'https://via.placeholder.com/50'}
+                    alt="Profile"
+                    className="w-12 h-12 rounded-full object-cover ring-2 ring-transparent dark:ring-slate-700 transition-all duration-300"
+                  />
+                  {!msg.isSeen && (
+                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-teal-300 dark:bg-teal-400 rounded-full ring-2 ring-white dark:ring-slate-800 animate-pulse" />
+                  )}
                 </div>
-                <div className="list-info ml-5 flex-col">
-                  <h3 className="font-medium text-2xl">{msg.User.username}</h3>
-                  <p className="text-sm text-ellipsis overflow-hidden">{msg.lastmessage}</p>
+                <div className="flex flex-col max-w-[12rem] sm:max-w-[15rem]">
+                  <h3 className="font-semibold text-lg truncate dark:text-white">{msg.User?.username || 'Unknown'}</h3>
+                  <p
+                    className={`text-sm truncate ${
+                      msg.isSeen
+                        ? 'text-slate-600 dark:text-slate-400'
+                        : 'text-white/90 dark:text-teal-100'
+                    }`}
+                  >
+                    {msg.lastmessage || 'No messages yet'}
+                  </p>
                 </div>
-              </section>
-            </section>
+              </div>
+            </motion.section>
           ))}
         </div>
       ) : (
-        <section className="flex flex-col p-4 text-center justify-center items-center mt-10 text-slate-700 ">
-          <h2 className="text-lg font-medium">Explore users to start a conversation with.</h2>
-        </section>
+        <div className="flex flex-col justify-center items-center h-full text-center text-slate-600 dark:text-slate-400">
+          <h2 className="text-lg font-medium">No messages found 💬</h2>
+          <p className="text-sm">Try starting a new chat!</p>
+        </div>
       )}
     </section>
   );

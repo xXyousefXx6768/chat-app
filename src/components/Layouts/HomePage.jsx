@@ -51,7 +51,7 @@ function HomePage() {
 
   
   return (  
-   <div className={`${darkmode && 'dark'} main-mode`}>  
+   <div className={`${darkmode && 'dark'} main-mode overflow-hidden`}>  
     <main className="flex h-screen">  
     <Sidebar
           open={openModal}

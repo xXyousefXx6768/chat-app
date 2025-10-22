@@ -34,16 +34,23 @@ function HomePage() {
   const handleopen = () => setOpenModal(!openModal);
   const handleDarkmode = () => setDarkmode(!darkmode);
 
-  const handleChatClick = (chatId, userid) => {
-    if (chatId) {
-      setSelectedChatId(chatId);
-      setCurrentChatId(chatId);
-      setOtherUser(userid);
-      navigate(`/homepage/chat/${chatId}/${userid}`);
-    } else {
-      console.error('Chat ID is undefined');
-    }
-  };
+ const handleChatClick = (chatId, selectedUser) => {
+  if (chatId) {
+    setSelectedChatId(chatId);
+    setCurrentChatId(chatId);
+    setOtherUser(selectedUser);
+  } else {
+    console.error('Chat ID is undefined');
+  }
+};
+
+// 👇 أضف useEffect جديد بعده مباشرة
+useEffect(() => {
+  if (selectedChatId) {
+    navigate(`/homepage/chat/${selectedChatId}`);
+  }
+}, [selectedChatId]);
+
 
   if (!user) {
     return <Navigate to="/auth/signup" replace />;
@@ -70,19 +77,21 @@ function HomePage() {
   </>
 ) : (
   <Routes>
-    {!selectedChatId && (
-      <Route
-        path="/homepage"
-        element={<ChatList onItemClick={handleChatClick} user={user} />}
-      />
-    )}
-    {selectedChatId && (
-      <Route
-        path="chat/:chatId/:userid"
-        element={<Mainchat chatId={currentChatId} otherUser={otherUser} currentUser={user} />}
-      />
-    )}
-  </Routes>
+  {!selectedChatId && (
+    <Route
+      path="*"
+      element={<ChatList onItemClick={handleChatClick} user={user} />}
+    />
+  )}
+  {selectedChatId && (
+   <Route
+  path="chat/:chatId"
+  element={<Mainchat chatId={currentChatId} otherUser={otherUser} currentUser={user} />}
+/>
+
+  )}
+</Routes>
+
 )}
 
     </main>  

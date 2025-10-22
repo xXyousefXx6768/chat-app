@@ -20,6 +20,7 @@ import {
   faSearch,
   faUpload,
 } from "@fortawesome/free-solid-svg-icons";
+import userImg from '../assets/user.png'
 
 function GroupModal({ onClose }) {
   const { user } = useUser();
@@ -101,6 +102,17 @@ function GroupModal({ onClose }) {
         groupPic: groupPic || null,
       });
 
+      // Create a corresponding chat document for the group
+      await setDoc(doc(db, "chats", groupId), {
+           messages: [],
+          createdAt: serverTimestamp(),
+          type: "group",
+         members: memberIds,
+        groupName: name,
+          groupPic: groupPic || null,
+});
+
+
       for (const memberId of memberIds) {
         const userChatRef = doc(db, "userChat", memberId);
         const snap = await getDoc(userChatRef);
@@ -136,7 +148,7 @@ function GroupModal({ onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white dark:bg-gray-900 dark:text-gray-100 rounded-2xl p-6 w-[380px] shadow-2xl transition-all duration-300 max-h-[90vh]  font-[Poppins]">
+      <div className="bg-white dark:bg-gray-900 dark:text-gray-100 rounded-2xl p-6 w-[380px] shadow-2xl transition-all duration-300 max-h-[90vh] scale-75  font-[Poppins]">
         {/* Header */}
         <div className="flex justify-between items-center mb-5">
           <h3 className="text-2xl font-semibold flex items-center gap-2">
@@ -210,7 +222,7 @@ function GroupModal({ onClose }) {
                 >
                   <img
                     src={
-                      friend.profilePicture || "https://via.placeholder.com/40"
+                      friend.profilePicture || userImg
                     }
                     alt={friend.username}
                     className="w-10 h-10 rounded-full object-cover border"

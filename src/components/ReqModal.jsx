@@ -22,6 +22,8 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
+import userImg from '../assets/user.png'
+
 function RequestsModal({ onClose }) {
   const { user } = useUser();
   const [requests, setRequests] = useState([]);
@@ -129,7 +131,7 @@ function RequestsModal({ onClose }) {
                   <img
                     src={
                       r.fromProfile ||
-                      "https://via.placeholder.com/40?text=User"
+                      userImg
                     }
                     alt="sender"
                     className="w-10 h-10 rounded-full object-cover border"

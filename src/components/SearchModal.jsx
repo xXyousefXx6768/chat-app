@@ -2,9 +2,11 @@ import React, { useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { collection, doc, getDocs, query, serverTimestamp, setDoc, where } from "firebase/firestore";
+import userImg from '../assets/user.png'
 import { db } from '../lib/firebase';
 import { useUser } from '../contexts/UserContext';
 import toast from 'react-hot-toast';
+
 
 function SearchModal({ onClose }) {
   const modalRef = useRef(null);
@@ -76,7 +78,7 @@ function SearchModal({ onClose }) {
     >
       <div
         ref={modalRef}
-        className="w-[90%] sm:w-[75%] md:w-[50%] lg:w-[40%] bg-white from-slate-100 dark:bg-gray-900 dark:text-gray-100 to-slate-200 rounded-3xl shadow-2xl p-6 border border-white/20 backdrop-blur-md transition-all duration-300"
+        className="w-[90%] sm:w-[75%] md:w-[50%] lg:w-[40%] scale-75 bg-white from-slate-100 dark:bg-gray-900 dark:text-gray-100 to-slate-200 rounded-3xl shadow-2xl p-6 border border-white/20 backdrop-blur-md transition-all duration-300"
       >
         <h2 className="text-2xl sm:text-3xl font-semibold  mb-6 text-center">
           Search People
@@ -100,10 +102,10 @@ function SearchModal({ onClose }) {
 
         <div className="mt-8 flex flex-col items-center gap-4">
           {people ? (
-            <div className="bg-white/80 dark:!bg-gray-800/40 w-full p-4 rounded-2xl shadow-md flex items-center justify-between hover:shadow-lg transition-all duration-200">
+            <div className="bg-white/80 dark:!bg-gray-800/40 w-full  p-4 rounded-2xl shadow-md flex items-center justify-between hover:shadow-lg transition-all duration-200">
               <div className="flex items-center gap-3">
                 <img
-                  src={people.profilePicture}
+                  src={people?.profilePicture  || userImg}
                   alt="Profile"
                   className="w-12 h-12 rounded-full border border-gray-300 object-cover"
                 />

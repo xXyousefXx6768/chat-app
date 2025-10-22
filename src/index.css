@@ -1,6 +1,17 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Chat background (switches with Tailwind dark mode) */
+.chat-bg {
+  background-image: url('/src/assets/wallapaper.jpeg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.dark .chat-bg {
+  background-image: url('/src/assets/darkmode.jpg');
+}
+
 li::marker{
     font-variant-numeric: unset;
     unicode-bidi: normal;

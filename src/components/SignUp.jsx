@@ -6,19 +6,21 @@ import { auth, db } from '../lib/firebase';
 import upload from '../lib/upload';
 import toast from 'react-hot-toast'; 
 import { motion } from "framer-motion";
+
+   
 function SignUp() {
  const [profilePic, setProfilePic] = useState({ File: null, url: '' });
   const [error, setError] = useState('');
   const navigate = useNavigate(); 
-
-  const handleImg = (e) => {
-    if (e.target.files[0]) {
-      setProfilePic({
-        File: e.target.files[0],
-        url: URL.createObjectURL(e.target.files[0]),
-      });
-    }
-  };
+             const handleImg = (e) => {
+                    if (e.target.files[0]) { 
+                     setProfilePic({
+                   File: e.target.files[0],
+                   url: URL.createObjectURL(e.target.files[0]),
+             });
+                           }
+                                   };
+                  
 
   const register = async (e) => {
     e.preventDefault();
@@ -167,7 +169,7 @@ function SignUp() {
         >
           Sign Up
         </motion.button>
-
+        
         <Link
           to="/auth/login"
           className="text-cyan-200 hover:text-white mt-4 transition-all"

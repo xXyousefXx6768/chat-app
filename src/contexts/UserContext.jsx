@@ -41,7 +41,18 @@ export const UserProvider = ({ children }) => {
       });
   }, []);
 
-  if (loading) return <div className="text-center p-5">Loading...</div>;
+   if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-100 to-slate-300 dark:from-gray-900 dark:to-gray-800 transition-all">
+        <div className="relative">
+          <div className="w-14 h-14 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-500 font-semibold text-sm">
+            ...
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <UserContext.Provider value={{ user, setUser, otherUser, setOtherUser }}>

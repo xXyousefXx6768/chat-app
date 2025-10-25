@@ -1,4 +1,3 @@
-// Mainchat.jsx (replace your component)
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faUpload, faSmile } from "@fortawesome/free-solid-svg-icons";
@@ -119,13 +118,27 @@ function Mainchat({ chatId, otherUser, currentUser }) {
   };
 
   // UI: show loading placeholder while chat null but chatId exists
-  if (!chat && chatId && loadingChat) {
-    return (
-      <section className="flex h-screen items-center justify-center">
-        <div className="text-center text-slate-500">Loading chat...</div>
-      </section>
-    );
-  }
+ if (!chat && chatId && loadingChat) {
+  return (
+    <section className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900 transition-colors duration-500">
+      <div className="flex flex-col items-center justify-center space-y-4">
+        {/* Spinner */}
+        <div className="relative">
+          <div className="w-14 h-14 border-4 border-slate-300 dark:border-slate-700 rounded-full animate-spin border-t-blue-500"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-5 h-5 bg-blue-500 rounded-full animate-ping opacity-75"></div>
+          </div>
+        </div>
+
+        {/* Loading text */}
+        <p className="text-slate-600 dark:text-slate-300 font-medium text-lg tracking-wide">
+          Loading chat...
+        </p>
+      </div>
+    </section>
+  );
+}
+
 
   return (
     <section className="flex h-screen flex-col w-full dark:bg-gray-900 bg-gradient-to-b from-slate-100 to-slate-300 transition-all duration-500">
@@ -157,7 +170,7 @@ function Mainchat({ chatId, otherUser, currentUser }) {
           </div>
 
           <section
-            className="chat-bg flex flex-col flex-grow overflow-y-auto p-6 gap-4 dark:bg-slate-800 scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-transparent dark:scrollbar-thumb-slate-600"
+            className="chat-bg flex flex-col flex-grow overflow-y-auto  p-6 gap-4 dark:bg-slate-800 scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-transparent dark:scrollbar-thumb-slate-600"
           >
             {chat?.messages?.map((msg, idx) => {
               const isSender = msg.senderId === currentUser.id;

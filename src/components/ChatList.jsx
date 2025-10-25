@@ -96,7 +96,7 @@ function ChatList({ onItemClick }) {
       </div>
 
       {filteredMessages.length > 0 ? (
-        <div className="h-[calc(100%-5rem)] flex flex-col overflow- scrollbar-thin scrollbar-thumb-slate-400 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent">
+        <div className="h-[calc(100%-5rem)] flex flex-col overflow-scroll scrollbar-thin scrollbar-thumb-slate-400 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent">
           {filteredMessages.map((msg) => (
             <motion.section
               key={msg.chatId} // use chatId as key

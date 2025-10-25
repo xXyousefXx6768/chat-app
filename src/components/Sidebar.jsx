@@ -65,7 +65,7 @@ function Sidebar({open,handle,darkmode,handleDarkmode,users,handleReqModal,handl
                  </span>
                  </li>
             <li className="group relative p-3 cursor-pointer text-gray-500 hover:text-blue-600">
-              <FontAwesomeIcon icon={faUser} className="h-6 w-6" />
+              <FontAwesomeIcon onClick={() => navigate("/homepage/profile")} icon={faUser} className="h-6 w-6" />
               <span className="absolute left-12 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all bg-gray-800 text-white px-2 py-1 rounded-md text-sm">
                 Profile
               </span>

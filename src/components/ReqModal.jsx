@@ -130,14 +130,14 @@ function RequestsModal({ onClose }) {
                 <div className="flex items-center gap-3">
                   <img
                     src={
-                      r.fromProfile ||
+                      r.profilePicture ||
                       userImg
                     }
                     alt="sender"
                     className="w-10 h-10 rounded-full object-cover border"
                   />
                   <div>
-                    <p className="font-semibold">{r.fromName || "Unknown"}</p>
+                    <p className="font-semibold">{r.username || "Unknown"}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       wants to be your friend
                     </p>
